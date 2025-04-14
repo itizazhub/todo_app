@@ -3,7 +3,9 @@ import 'package:todo_app/features/todos/data/datasources/task_firebase_datasourc
 import 'package:todo_app/features/todos/data/repository/task_repository_impl.dart';
 import 'package:todo_app/features/todos/domain/entities/task.dart';
 import 'package:todo_app/features/todos/domain/usecases/add_task.dart';
+import 'package:todo_app/features/todos/domain/usecases/delete_task.dart';
 import 'package:todo_app/features/todos/domain/usecases/get_tasks.dart';
+import 'package:todo_app/features/todos/domain/usecases/update_task.dart';
 
 final datasource = Provider<TaskFirebaseDatasource>((ref) {
   return TaskFirebaseDatasource();
@@ -20,24 +22,37 @@ final getTasksProvider = Provider<GetTasks>((ref) {
 });
 
 // Provider for AddTask use case
-final addTasksProvider = Provider<AddTask>((ref) {
+final addTaskProvider = Provider<AddTask>((ref) {
   return AddTask(repository: ref.read(taskRepositoryProvider));
+});
+
+final deleteTaskProvider = Provider<DeleteTask>((ref) {
+  return DeleteTask(repository: ref.read(taskRepositoryProvider));
+});
+final updateTaskProvider = Provider<UpdateTask>((ref) {
+  return UpdateTask(repository: ref.read(taskRepositoryProvider));
 });
 
 // StateNotifierProvider for managing tasks state
 final taskListNotifierProvider =
     StateNotifierProvider<TaskListNotifier, List<Task>>((ref) {
   final getTasks = ref.read(getTasksProvider);
-  final addTask = ref.read(addTasksProvider);
-  return TaskListNotifier(getTasks, addTask);
+  final addTask = ref.read(addTaskProvider);
+  final deleteTask = ref.read(deleteTaskProvider);
+  final updateTask = ref.read(updateTaskProvider);
+  return TaskListNotifier(getTasks, addTask, deleteTask, updateTask);
 });
 
 // TaskListNotifier to manage task states (loading, adding tasks)
 class TaskListNotifier extends StateNotifier<List<Task>> {
-  TaskListNotifier(this._getTasks, this._addTask) : super([]);
+  TaskListNotifier(
+      this._getTasks, this._addTask, this._deleteTask, this._updateTask)
+      : super([]);
 
   final GetTasks _getTasks;
   final AddTask _addTask;
+  final DeleteTask _deleteTask;
+  final UpdateTask _updateTask;
 
   // Method to load tasks
   Future<void> loadTasks() async {
@@ -50,5 +65,15 @@ class TaskListNotifier extends StateNotifier<List<Task>> {
   Future<void> addNewTask(Task task) async {
     await _addTask(task); // Add a new task using AddTask use case
     loadTasks(); // Optionally, reload tasks after adding
+  }
+
+  Future<void> deleteTask(String id) async {
+    await _deleteTask(id);
+    loadTasks();
+  }
+
+  Future<void> updateTask(Task task) async {
+    await _updateTask(task);
+    loadTasks();
   }
 }

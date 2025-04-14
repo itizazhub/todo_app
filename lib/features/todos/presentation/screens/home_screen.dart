@@ -35,20 +35,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               TextField(
                 controller: titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Task Title",
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Task Description",
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   final title = titleController.text;
@@ -69,6 +69,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
                 child: Text("Add Task"),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _deleteTask(String id) {
+    ref.watch(taskListNotifierProvider.notifier).deleteTask(id);
+  }
+
+  void _updateTask(Task task) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        // Create a TextEditingController to handle user input
+        final TextEditingController titleController =
+            TextEditingController(text: task.title);
+        final TextEditingController descriptionController =
+            TextEditingController(text: task.description);
+
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: "Task Title",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: "Task Description",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  final title = titleController.text;
+                  final description = descriptionController.text;
+
+                  if (title.isNotEmpty && description.isNotEmpty) {
+                    // Call the function to add the task
+                    final task = Task(
+                        status: false,
+                        id: "1",
+                        title: title,
+                        description: description);
+                    ref
+                        .watch(taskListNotifierProvider.notifier)
+                        .updateTask(task);
+                    Navigator.pop(
+                        context); // Close the bottom sheet after adding
+                  }
+                },
+                child: const Text("Update Task"),
               ),
             ],
           ),
@@ -122,13 +185,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                // Implement task editing functionality here
+                                _updateTask(
+                                    task); // Implement task editing functionality here
                               },
                               icon: const Icon(Icons.edit),
                             ),
                             IconButton(
                               onPressed: () {
-                                // Implement task delete functionality here
+                                _deleteTask(task
+                                    .id); // Implement task delete functionality here
                               },
                               icon: const Icon(Icons.delete),
                             ),

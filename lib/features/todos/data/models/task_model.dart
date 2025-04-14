@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/features/todos/domain/entities/task.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskModel {
   String id;
@@ -9,11 +10,10 @@ class TaskModel {
 
   // Constructor
   TaskModel({
-    required this.id,
     required this.title,
     required this.description,
-    required this.status,
-  });
+  })  : id = const Uuid().v4(),
+        status = false;
 
   // Named constructor for creating an instance from JSON
   TaskModel.fromJson(Map<String, dynamic> json)

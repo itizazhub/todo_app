@@ -14,7 +14,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  void deleteTask(String id) {
+  Future<void> deleteTask(String id) async {
     taskFirebaseDatasource.deleteTask(id);
   }
 
@@ -28,7 +28,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  void updateTask(String id, Task task) {
-    taskFirebaseDatasource.updateTask(id, TaskModel.fromEntity(task));
+  Future<void> updateTask(Task task) async {
+    taskFirebaseDatasource.updateTask(TaskModel.fromEntity(task));
   }
 }

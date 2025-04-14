@@ -5,7 +5,7 @@ class UpdateTask {
   UpdateTask({required this.repository});
   final TaskRepository repository;
 
-  void call(String id, Task task) {
-    return repository.updateTask(id, task);
+  Future<void> call(Task task) {
+    return repository.updateTask(task);
   }
 }

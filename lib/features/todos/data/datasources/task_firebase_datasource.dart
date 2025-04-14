@@ -61,47 +61,46 @@ class TaskFirebaseDatasource {
 
   // Deleting a task from Firebase
   Future<void> deleteTask(String id) async {
-    // final url = Uri.https(
-    //     "todo-app-ec71c-default-rtdb.firebaseio.com", "task/$id.json");
+    final url = Uri.https(
+        "todo-app-ec71c-default-rtdb.firebaseio.com", "task/$id.json");
 
-    // try {
-    //   final response =
-    //       await http.delete(url, headers: {"Content-Type": "application/json"});
+    try {
+      final response =
+          await http.delete(url, headers: {"Content-Type": "application/json"});
 
-    //   // Correcting the status code check
-    //   if (response.statusCode >= 200 && response.statusCode < 300) {
-    //     print("Task deleted successfully ${response.statusCode}");
-    //   } else {
-    //     print("Error happened ${response.statusCode}");
-    //   }
-    // } catch (e) {
-    //   print("Something bad happened $e");
-    // }
+      // Correcting the status code check
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print("Task deleted successfully ${response.statusCode}");
+      } else {
+        print("Error happened ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Something bad happened $e");
+    }
   }
 
   // Updating a task on Firebase
-  Future<void> updateTask(String id, TaskModel task) async {
-    //   final url = Uri.https(
-    //       "todo-app-ec71c-default-rtdb.firebaseio.com", "task/$id.json");
+  Future<void> updateTask(TaskModel task) async {
+    final url = Uri.https(
+        "todo-app-ec71c-default-rtdb.firebaseio.com", "task/${task.id}.json");
 
-    //   try {
-    //     final response = await http.patch(url,
-    //         headers: {"Content-Type": "application/json"},
-    //         body: json.encode({
-    //           "id": task.id,
-    //           "title": task.title,
-    //           "description": task.description,
-    //           "status": task.status,
-    //         }));
+    try {
+      final response = await http.patch(url,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({
+            "title": task.title,
+            "description": task.description,
+            "status": task.status,
+          }));
 
-    //     // Correcting the status code check
-    //     if (response.statusCode >= 200 && response.statusCode < 300) {
-    //       print("Task updated successfully ${response.statusCode}");
-    //     } else {
-    //       print("Error happened ${response.statusCode}");
-    //     }
-    //   } catch (e) {
-    //     print("Something bad happened $e");
-    //   }
+      // Correcting the status code check
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print("Task updated successfully ${response.statusCode}");
+      } else {
+        print("Error happened ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Something bad happened $e");
+    }
   }
 }
