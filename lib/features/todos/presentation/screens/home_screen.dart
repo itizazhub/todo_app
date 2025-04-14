@@ -16,7 +16,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     // Load tasks only once when the screen is first initialized
-    // ref.read(taskListNotifierProvider.notifier).loadTasks();
+    ref.read(taskListNotifierProvider.notifier).loadTasks();
   }
 
   void _addTask() {
@@ -62,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         title: title,
                         description: description);
                     ref
-                        .read(taskListNotifierProvider.notifier)
+                        .watch(taskListNotifierProvider.notifier)
                         .addNewTask(task);
                     Navigator.pop(
                         context); // Close the bottom sheet after adding

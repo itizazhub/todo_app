@@ -5,9 +5,13 @@ import 'package:todo_app/features/todos/domain/entities/task.dart';
 import 'package:todo_app/features/todos/domain/usecases/add_task.dart';
 import 'package:todo_app/features/todos/domain/usecases/get_tasks.dart';
 
+final datasource = Provider<TaskFirebaseDatasource>((ref) {
+  return TaskFirebaseDatasource();
+});
+
 // Provider for Task Repository
 final taskRepositoryProvider = Provider<TaskRepositoryImpl>((ref) {
-  return TaskRepositoryImpl();
+  return TaskRepositoryImpl(taskFirebaseDatasource: ref.read(datasource));
 });
 
 // Provider for GetTasks use case
@@ -37,6 +41,7 @@ class TaskListNotifier extends StateNotifier<List<Task>> {
 
   // Method to load tasks
   Future<void> loadTasks() async {
+    print("taska are loading...");
     final tasks = await _getTasks(); // Fetch tasks using GetTasks use case
     state = tasks; // Update state with the fetched tasks
   }

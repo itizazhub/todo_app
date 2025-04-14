@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 class TaskFirebaseDatasource {
   // Fetching tasks from Firebase
   Future<List<TaskModel>> getTasks() async {
+    print("taska are loading from firebase...");
     final url =
         Uri.https("todo-app-ec71c-default-rtdb.firebaseio.com", "task.json");
 

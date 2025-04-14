@@ -4,7 +4,9 @@ import 'package:todo_app/features/todos/domain/entities/task.dart';
 import 'package:todo_app/features/todos/domain/repositories/task_repository.dart';
 
 class TaskRepositoryImpl implements TaskRepository {
-  late final TaskFirebaseDatasource taskFirebaseDatasource;
+  final TaskFirebaseDatasource taskFirebaseDatasource;
+
+  TaskRepositoryImpl({required this.taskFirebaseDatasource});
 
   @override
   Future<void> addTask(Task task) async {
@@ -18,6 +20,7 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<List<Task>> getTasks() async {
+    print("taska are getting...");
     final List<TaskModel> tasks = await taskFirebaseDatasource.getTasks();
     return tasks.map((task) {
       return task.toEntity();
