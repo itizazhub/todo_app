@@ -193,16 +193,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             TextButton(
                                 onPressed: () async {
-                                  if (_taskStatus) {
-                                    _taskStatus = false;
-                                  } else {
-                                    _taskStatus = true;
-                                  }
                                   await _updateTaskStatus(Task(
                                       id: task.id,
                                       title: task.title,
                                       description: task.description,
-                                      status: _taskStatus));
+                                      status: task.status ? false : true));
                                 },
                                 child: Text(
                                   task.status ? "completed" : "Pending...",
