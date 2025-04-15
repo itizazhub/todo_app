@@ -31,4 +31,9 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<void> updateTask(Task task) async {
     taskFirebaseDatasource.updateTask(TaskModel.fromEntity(task));
   }
+
+  @override
+  Future<void> updateTaskStatus(Task task) async {
+    taskFirebaseDatasource.updateTaskStatus(TaskModel.fromEntity(task));
+  }
 }

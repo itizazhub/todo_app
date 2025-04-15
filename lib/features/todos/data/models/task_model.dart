@@ -9,15 +9,15 @@ class TaskModel {
   bool status;
 
   // Constructor
-  TaskModel({
-    required this.title,
-    required this.description,
-  })  : id = const Uuid().v4(),
-        status = false;
+  TaskModel(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.status});
 
   // Named constructor for creating an instance from JSON
-  TaskModel.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
+  TaskModel.fromJson(String key, Map<String, dynamic> json)
+      : id = key,
         title = json["title"],
         description = json["description"],
         status = json["status"];

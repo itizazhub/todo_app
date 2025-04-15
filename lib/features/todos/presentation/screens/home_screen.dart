@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_app/features/todos/presentation/providers/task_provider.dart';
 import 'package:todo_app/features/todos/domain/entities/task.dart';
+import 'package:uuid/uuid.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _taskStatus = false;
+
   @override
   void initState() {
     super.initState();
@@ -19,7 +22,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.read(taskListNotifierProvider.notifier).loadTasks();
   }
 
-  void _addTask() {
+  Future<void> _addTask() async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -58,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     // Call the function to add the task
                     final task = Task(
                         status: false,
-                        id: "1",
+                        id: const Uuid().v4(),
                         title: title,
                         description: description);
                     ref
@@ -77,11 +80,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _deleteTask(String id) {
+  Future<void> _deleteTask(String id) async {
     ref.watch(taskListNotifierProvider.notifier).deleteTask(id);
   }
 
-  void _updateTask(Task task) {
+  Future<void> _updateTask(Task task) async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -119,14 +122,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   if (title.isNotEmpty && description.isNotEmpty) {
                     // Call the function to add the task
-                    final task = Task(
-                        status: false,
-                        id: "1",
+
+                    final updatedTask = Task(
+                        status: task.status,
+                        id: task.id,
                         title: title,
                         description: description);
                     ref
                         .watch(taskListNotifierProvider.notifier)
-                        .updateTask(task);
+                        .updateTask(updatedTask);
                     Navigator.pop(
                         context); // Close the bottom sheet after adding
                   }
@@ -138,6 +142,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
       },
     );
+  }
+
+  Future<void> _updateTaskStatus(Task task) async {
+    ref.watch(taskListNotifierProvider.notifier).updateTaskStatus(task);
   }
 
   @override
@@ -154,8 +162,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              _addTask();
+            onPressed: () async {
+              await _addTask();
             },
             icon: const Icon(Icons.add),
           ),
@@ -183,16 +191,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            TextButton(
+                                onPressed: () async {
+                                  if (_taskStatus) {
+                                    _taskStatus = false;
+                                  } else {
+                                    _taskStatus = true;
+                                  }
+                                  await _updateTaskStatus(Task(
+                                      id: task.id,
+                                      title: task.title,
+                                      description: task.description,
+                                      status: _taskStatus));
+                                },
+                                child: Text(
+                                  task.status ? "completed" : "Pending...",
+                                  style: TextStyle(
+                                      color: task.status
+                                          ? Colors.green
+                                          : Colors.red),
+                                )),
                             IconButton(
-                              onPressed: () {
-                                _updateTask(
+                              onPressed: () async {
+                                await _updateTask(
                                     task); // Implement task editing functionality here
                               },
                               icon: const Icon(Icons.edit),
                             ),
                             IconButton(
-                              onPressed: () {
-                                _deleteTask(task
+                              onPressed: () async {
+                                await _deleteTask(task
                                     .id); // Implement task delete functionality here
                               },
                               icon: const Icon(Icons.delete),

@@ -6,6 +6,7 @@ import 'package:todo_app/features/todos/domain/usecases/add_task.dart';
 import 'package:todo_app/features/todos/domain/usecases/delete_task.dart';
 import 'package:todo_app/features/todos/domain/usecases/get_tasks.dart';
 import 'package:todo_app/features/todos/domain/usecases/update_task.dart';
+import 'package:todo_app/features/todos/domain/usecases/update_task_status.dart';
 
 final datasource = Provider<TaskFirebaseDatasource>((ref) {
   return TaskFirebaseDatasource();
@@ -33,6 +34,10 @@ final updateTaskProvider = Provider<UpdateTask>((ref) {
   return UpdateTask(repository: ref.read(taskRepositoryProvider));
 });
 
+final updateTaskStatusProvider = Provider<UpdateTaskStatus>((ref) {
+  return UpdateTaskStatus(repository: ref.read(taskRepositoryProvider));
+});
+
 // StateNotifierProvider for managing tasks state
 final taskListNotifierProvider =
     StateNotifierProvider<TaskListNotifier, List<Task>>((ref) {
@@ -40,19 +45,22 @@ final taskListNotifierProvider =
   final addTask = ref.read(addTaskProvider);
   final deleteTask = ref.read(deleteTaskProvider);
   final updateTask = ref.read(updateTaskProvider);
-  return TaskListNotifier(getTasks, addTask, deleteTask, updateTask);
+  final updateTaskStatus = ref.read(updateTaskStatusProvider);
+  return TaskListNotifier(
+      getTasks, addTask, deleteTask, updateTask, updateTaskStatus);
 });
 
 // TaskListNotifier to manage task states (loading, adding tasks)
 class TaskListNotifier extends StateNotifier<List<Task>> {
-  TaskListNotifier(
-      this._getTasks, this._addTask, this._deleteTask, this._updateTask)
+  TaskListNotifier(this._getTasks, this._addTask, this._deleteTask,
+      this._updateTask, this._updateTaskStatus)
       : super([]);
 
   final GetTasks _getTasks;
   final AddTask _addTask;
   final DeleteTask _deleteTask;
   final UpdateTask _updateTask;
+  final UpdateTaskStatus _updateTaskStatus;
 
   // Method to load tasks
   Future<void> loadTasks() async {
@@ -74,6 +82,11 @@ class TaskListNotifier extends StateNotifier<List<Task>> {
 
   Future<void> updateTask(Task task) async {
     await _updateTask(task);
+    loadTasks();
+  }
+
+  Future<void> updateTaskStatus(Task task) async {
+    await _updateTaskStatus(task);
     loadTasks();
   }
 }
