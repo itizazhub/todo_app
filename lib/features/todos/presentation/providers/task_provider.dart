@@ -77,16 +77,21 @@ class TaskListNotifier extends StateNotifier<List<Task>> {
 
   Future<void> deleteTask(String id) async {
     await _deleteTask(id);
-    loadTasks();
+    await loadTasks();
   }
 
   Future<void> updateTask(Task task) async {
     await _updateTask(task);
-    loadTasks();
+    await loadTasks();
   }
 
   Future<void> updateTaskStatus(Task task) async {
+    // state = [
+    //   for (final t in state)
+    //     if (t.id == task.id) task else t,
+    // ];
+
     await _updateTaskStatus(task);
-    loadTasks();
+    await loadTasks();
   }
 }

@@ -13,221 +13,226 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  bool _taskStatus = false;
+  final Set<String> _updatingTaskIds = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Load tasks only once when the screen is first initialized
-    ref.read(taskListNotifierProvider.notifier).loadTasks();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await ref.read(taskListNotifierProvider.notifier).loadTasks();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _addTask() async {
-    showModalBottomSheet(
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    await showModalBottomSheet(
       context: context,
-      builder: (context) {
-        // Create a TextEditingController to handle user input
-        final TextEditingController titleController = TextEditingController();
-        final TextEditingController descriptionController =
-            TextEditingController();
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: "Task Title",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: "Task Description",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                final title = titleController.text;
+                final description = descriptionController.text;
 
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: "Task Title",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: "Task Description",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  final title = titleController.text;
-                  final description = descriptionController.text;
+                if (title.isNotEmpty && description.isNotEmpty) {
+                  final task = Task(
+                    id: const Uuid().v4(),
+                    title: title,
+                    description: description,
+                    status: false,
+                  );
+                  ref.read(taskListNotifierProvider.notifier).addNewTask(task);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("Add Task"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                  if (title.isNotEmpty && description.isNotEmpty) {
-                    // Call the function to add the task
-                    final task = Task(
-                        status: false,
-                        id: const Uuid().v4(),
-                        title: title,
-                        description: description);
-                    ref
-                        .watch(taskListNotifierProvider.notifier)
-                        .addNewTask(task);
-                    Navigator.pop(
-                        context); // Close the bottom sheet after adding
-                  }
-                },
-                child: Text("Add Task"),
+  Future<void> _updateTask(Task task) async {
+    final titleController = TextEditingController(text: task.title);
+    final descriptionController = TextEditingController(text: task.description);
+
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: "Task Title",
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
-        );
-      },
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: "Task Description",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                final title = titleController.text;
+                final description = descriptionController.text;
+
+                if (title.isNotEmpty && description.isNotEmpty) {
+                  final updatedTask = Task(
+                    id: task.id,
+                    title: title,
+                    description: description,
+                    status: task.status,
+                  );
+                  ref
+                      .read(taskListNotifierProvider.notifier)
+                      .updateTask(updatedTask);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("Update Task"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Future<void> _deleteTask(String id) async {
-    ref.watch(taskListNotifierProvider.notifier).deleteTask(id);
+    ref.read(taskListNotifierProvider.notifier).deleteTask(id);
   }
 
-  Future<void> _updateTask(Task task) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        // Create a TextEditingController to handle user input
-        final TextEditingController titleController =
-            TextEditingController(text: task.title);
-        final TextEditingController descriptionController =
-            TextEditingController(text: task.description);
+  Future<void> _toggleTaskStatus(Task task) async {
+    setState(() {
+      _updatingTaskIds.add(task.id);
+    });
 
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: "Task Title",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: "Task Description",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  final title = titleController.text;
-                  final description = descriptionController.text;
-
-                  if (title.isNotEmpty && description.isNotEmpty) {
-                    // Call the function to add the task
-
-                    final updatedTask = Task(
-                        status: task.status,
-                        id: task.id,
-                        title: title,
-                        description: description);
-                    ref
-                        .watch(taskListNotifierProvider.notifier)
-                        .updateTask(updatedTask);
-                    Navigator.pop(
-                        context); // Close the bottom sheet after adding
-                  }
-                },
-                child: const Text("Update Task"),
-              ),
-            ],
-          ),
+    await ref.read(taskListNotifierProvider.notifier).updateTaskStatus(
+          task.copyWith(status: !task.status),
         );
-      },
-    );
-  }
 
-  Future<void> _updateTaskStatus(Task task) async {
-    ref.watch(taskListNotifierProvider.notifier).updateTaskStatus(task);
+    setState(() {
+      _updatingTaskIds.remove(task.id);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Task> tasks = ref.watch(
-        taskListNotifierProvider); // Make sure tasks is typed as List<Task>
+    final tasks = ref.watch(taskListNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(
-          "To Do App",
-          style: GoogleFonts.outfit(fontSize: 20),
-        ),
+        title: Text("To Do App", style: GoogleFonts.outfit(fontSize: 20)),
         actions: [
           IconButton(
-            onPressed: () async {
-              await _addTask();
-            },
+            onPressed: _addTask,
             icon: const Icon(Icons.add),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Tasks", style: TextStyle(fontSize: 18)),
-          ),
-          Expanded(
-            child: tasks.isEmpty
-                ? Center(child: Text("No tasks available"))
-                : ListView.builder(
-                    itemCount: tasks.length,
-                    itemBuilder: (context, index) {
-                      var task = tasks[index];
-                      return ListTile(
-                        leading: const Icon(Icons.task_alt),
-                        title: Text(
-                            task.title), // Assuming task has a 'title' field
-                        subtitle: Text(task
-                            .description), // Assuming task has a 'description' field
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextButton(
-                                onPressed: () async {
-                                  await _updateTaskStatus(Task(
-                                      id: task.id,
-                                      title: task.title,
-                                      description: task.description,
-                                      status: task.status ? false : true));
-                                },
-                                child: Text(
-                                  task.status ? "completed" : "Pending...",
-                                  style: TextStyle(
-                                      color: task.status
-                                          ? Colors.green
-                                          : Colors.red),
-                                )),
-                            IconButton(
-                              onPressed: () async {
-                                await _updateTask(
-                                    task); // Implement task editing functionality here
-                              },
-                              icon: const Icon(Icons.edit),
-                            ),
-                            IconButton(
-                              onPressed: () async {
-                                await _deleteTask(task
-                                    .id); // Implement task delete functionality here
-                              },
-                              icon: const Icon(Icons.delete),
-                            ),
-                          ],
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("Tasks", style: TextStyle(fontSize: 18)),
+                ),
+                Expanded(
+                  child: tasks.isEmpty
+                      ? const Center(child: Text("No tasks available"))
+                      : ListView.builder(
+                          itemCount: tasks.length,
+                          itemBuilder: (context, index) {
+                            final task = tasks[index];
+                            return ListTile(
+                              leading: const Icon(Icons.task_alt),
+                              title: Text(task.title),
+                              subtitle: Text(task.description),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextButton(
+                                    onPressed:
+                                        _updatingTaskIds.contains(task.id)
+                                            ? null
+                                            : () => _toggleTaskStatus(task),
+                                    child: _updatingTaskIds.contains(task.id)
+                                        ? const SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Text(
+                                            task.status
+                                                ? "Completed"
+                                                : "Pending...",
+                                            style: TextStyle(
+                                              color: task.status
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            ),
+                                          ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _updateTask(task),
+                                    icon: const Icon(Icons.edit),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _deleteTask(task.id),
+                                    icon: const Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+                ),
+              ],
+            ),
     );
   }
 }

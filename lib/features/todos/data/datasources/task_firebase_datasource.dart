@@ -44,7 +44,7 @@ class TaskFirebaseDatasource {
       final response = await http.post(url,
           headers: {"Content-Type": "application/json"},
           body: json.encode({
-            "id": task.id,
+            // "id": task.id,
             "title": task.title,
             "description": task.description,
             "status": task.status,
@@ -108,6 +108,7 @@ class TaskFirebaseDatasource {
 
 // Updating a task on Firebase
   Future<void> updateTask(TaskModel task) async {
+    print(task.id);
     final url = Uri.https(
         "todo-app-ec71c-default-rtdb.firebaseio.com", "task/${task.id}.json");
 

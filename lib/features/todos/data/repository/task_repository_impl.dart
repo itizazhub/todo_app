@@ -10,12 +10,12 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<void> addTask(Task task) async {
-    taskFirebaseDatasource.addTask(TaskModel.fromEntity(task));
+    await taskFirebaseDatasource.addTask(TaskModel.fromEntity(task));
   }
 
   @override
   Future<void> deleteTask(String id) async {
-    taskFirebaseDatasource.deleteTask(id);
+    await taskFirebaseDatasource.deleteTask(id);
   }
 
   @override
@@ -29,11 +29,11 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<void> updateTask(Task task) async {
-    taskFirebaseDatasource.updateTask(TaskModel.fromEntity(task));
+    await taskFirebaseDatasource.updateTask(TaskModel.fromEntity(task));
   }
 
   @override
   Future<void> updateTaskStatus(Task task) async {
-    taskFirebaseDatasource.updateTaskStatus(TaskModel.fromEntity(task));
+    await taskFirebaseDatasource.updateTaskStatus(TaskModel.fromEntity(task));
   }
 }

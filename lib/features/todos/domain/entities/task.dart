@@ -8,4 +8,18 @@ class Task {
   String title;
   String description;
   bool status;
+
+  Task copyWith({
+    String? id,
+    String? title,
+    String? description,
+    bool? status,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      status: status ?? this.status,
+    );
+  }
 }
