@@ -43,7 +43,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       builder: (context) => Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
@@ -92,9 +91,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(32.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
@@ -163,7 +161,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("To Do App", style: GoogleFonts.outfit(fontSize: 20)),
+        title: Text("To Do App",
+            style:
+                GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w700)),
         actions: [
           IconButton(
             onPressed: _addTask,
@@ -175,9 +175,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("Tasks", style: TextStyle(fontSize: 18)),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Tasks",
+                    style: GoogleFonts.outfit(
+                        fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
                 ),
                 Expanded(
                   child: tasks.isEmpty
@@ -188,8 +192,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             final task = tasks[index];
                             return ListTile(
                               leading: const Icon(Icons.task_alt),
-                              title: Text(task.title),
-                              subtitle: Text(task.description),
+                              title: Text(
+                                task.title,
+                                style: GoogleFonts.outfit(
+                                    fontSize: 18, fontWeight: FontWeight.w400),
+                              ),
+                              subtitle: Text(
+                                task.description,
+                                style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal),
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -211,19 +224,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 ? "Completed"
                                                 : "Pending...",
                                             style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.normal,
                                               color: task.status
                                                   ? Colors.green
                                                   : Colors.red,
                                             ),
                                           ),
                                   ),
-                                  IconButton(
-                                    onPressed: () => _updateTask(task),
-                                    icon: const Icon(Icons.edit),
+                                  InkWell(
+                                    onTap: () => _updateTask(task),
+                                    child: const Icon(Icons.edit),
                                   ),
-                                  IconButton(
-                                    onPressed: () => _deleteTask(task.id),
-                                    icon: const Icon(Icons.delete),
+                                  const SizedBox(width: 10),
+                                  InkWell(
+                                    onTap: () => _deleteTask(task.id),
+                                    child: const Icon(Icons.delete),
                                   ),
                                 ],
                               ),
